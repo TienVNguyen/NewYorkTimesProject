@@ -5,7 +5,7 @@ Week 2: Assignment.
 
 **NewYorkTimesProject** is an android app that allows a user to search for articles on web using simple filters. The app utilizes [New York Times Search API](http://developer.nytimes.com/docs/read/article_search_api_v2).
 
-Time spent: **X** hours spent in total
+Time spent: **2** hours spent in total
 
 ## User Stories
 
@@ -60,8 +60,12 @@ Describe any challenges encountered while building the app.
 
 ## Open-source libraries used
 
-- [Android Async HTTP](https://github.com/loopj/android-async-http) - Simple asynchronous HTTP requests with JSON parsing
-- [Picasso](http://square.github.io/picasso/) - Image loading and caching library for Android
+- [Retrofit2](https://github.com/square/retrofit) - Type-safe HTTP client for Android and Java by Square, Inc.
+- [Retrofit2-Gson] (https://github.com/square/retrofit/wiki/Converters) com.squareup.retrofit2:converter-gson.
+- [Glide](https://github.com/bumptech/glide) - An image loading and caching library for Android focused on smooth scrolling.
+- [Glide-Transformations](https://github.com/wasabeef/glide-transformations) - An Android transformation library providing a variety of image transformations for Glide.
+- [Butterknife] (https://github.com/JakeWharton/butterknife/) - Bind Android views and callbacks to fields and methods.
+- [Recyclerview-Animators] (https://github.com/wasabeef/recyclerview-animators) - An Android Animation library which easily add itemanimator to RecyclerView items.
 
 ## License
 
