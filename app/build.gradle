@@ -6,7 +6,9 @@
  */
 
 apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'android-apt'
+apply plugin: 'me.tatarka.retrolambda'
 
 android {
     compileSdkVersion 24
@@ -17,6 +19,7 @@ android {
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
+        buildConfigField("String", "API_KEY", "${apiKey}")
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -24,6 +27,13 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    retrolambda {
+        jdk '/path/to/java-8/jdk'
     }
 }
 
@@ -38,6 +48,8 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:24.2.1'
     compile 'jp.wasabeef:recyclerview-animators:1.2.2'
     compile 'com.jakewharton:butterknife:8.4.0'
+    compile 'org.parceler:parceler-api:1.1.1'
+    apt 'org.parceler:parceler:1.1.1'
     apt 'com.jakewharton:butterknife-compiler:8.4.0'
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'

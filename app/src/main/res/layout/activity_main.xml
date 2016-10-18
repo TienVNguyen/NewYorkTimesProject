@@ -16,19 +16,26 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <ProgressBar
-            android:id="@+id/progressBarHead"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/recyclerView"
+            android:id="@+id/recyclerViewArticles"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
         <ProgressBar
-            android:id="@+id/progressBarBottom"
+            android:id="@+id/progressBarLoading"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:visibility="gone" />
+
+        <ProgressBar
+            android:id="@+id/progressBarMore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:paddingBottom="@dimen/activity_horizontal_padding"
+            android:visibility="gone" />
     </RelativeLayout>
 </android.support.v4.widget.SwipeRefreshLayout>
