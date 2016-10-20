@@ -25,6 +25,11 @@ public class UrlConstants {
     public final static String BASE_URL = "https://api.nytimes.com/svc/search/v2/";
 
     /**
+     * STATIC_BASE_URL
+     */
+    public final static String STATIC_BASE_URL = "http://www.nytimes.com/";
+
+    /**
      * BEGIN_DATE
      */
     public static final String BEGIN_DATE = "begin_date";
@@ -40,9 +45,9 @@ public class UrlConstants {
     public static final String FQ = "fq";
 
     /**
-     * NEWS_DESK
+     * query
      */
-    public static final String NEWS_DESK = "news_desk";
+    public static final String QUERY = "query";
 
     /**
      * PAGE

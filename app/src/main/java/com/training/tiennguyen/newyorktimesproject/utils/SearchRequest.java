@@ -27,9 +27,8 @@ public class SearchRequest {
         final LinkedHashMap<String, String> queryMap = new LinkedHashMap<>();
         queryMap.put(UrlConstants.BEGIN_DATE, "20160112");
         queryMap.put(UrlConstants.SORT, "oldest");
-        queryMap.put(UrlConstants.FQ, "news_desk");
-        queryMap.put(UrlConstants.NEWS_DESK, "Education");
-        queryMap.put(UrlConstants.PAGE, "10");
+        queryMap.put(UrlConstants.FQ, "news_desk:(\"Education\" \"Health\")");
+        queryMap.put(UrlConstants.PAGE, "0");
         return queryMap;
     }
 }

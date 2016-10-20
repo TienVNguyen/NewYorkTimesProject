@@ -13,6 +13,7 @@ import com.training.tiennguyen.newyorktimesproject.constants.UrlConstants;
 import com.training.tiennguyen.newyorktimesproject.models.ArticleResponseModel;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
@@ -21,6 +22,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -30,8 +32,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * @author TienVNguyen
  */
 public class RetrofitUtil {
-    public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-    public static final Gson GSON = new Gson();
+    private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    private static final Gson GSON = new Gson();
 
     /**
      * Get
@@ -53,17 +55,21 @@ public class RetrofitUtil {
      */
     private static OkHttpClient getClient() {
         return new OkHttpClient.Builder()
-                .addInterceptor(getInterceptor())
+                .readTimeout(10, TimeUnit.SECONDS)
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .addInterceptor(loggingInterceptor())
+                .addInterceptor(getApiInterceptor())
+                .addInterceptor(loggingInterceptor())
                 .addInterceptor(getInterceptorForResponse())
                 .build();
     }
 
     /**
-     * Get key Interceptor
+     * Get API Interceptor
      *
      * @return {@link Interceptor}
      */
-    private static Interceptor getInterceptor() {
+    private static Interceptor getApiInterceptor() {
         return chain -> chain.proceed(getRequest(chain));
     }
 
@@ -96,14 +102,14 @@ public class RetrofitUtil {
      * @return {@link Request}
      */
     private static Response getResponse(Interceptor.Chain chain) throws IOException {
-        Request request = chain.request();
-        Response response = chain.proceed(request);
-        ResponseBody responseBody = response.body();
-        ArticleResponseModel articleResponseModel = GSON.fromJson(responseBody.toString(), ArticleResponseModel.class);
+        final Request request = chain.request();
+        final Response response = chain.proceed(request);
+        final ResponseBody responseBody = response.body();
+        final ArticleResponseModel articleResponseModel = GSON.fromJson(responseBody.toString(), ArticleResponseModel.class);
         responseBody.close();
 
         return response.newBuilder()
-                .body(ResponseBody.create(JSON, articleResponseModel.getmResponse().toString()))
+                .body(ResponseBody.create(JSON, articleResponseModel.getResponse().toString()))
                 .build();
     }
 
@@ -118,5 +124,16 @@ public class RetrofitUtil {
                 .newBuilder()
                 .addQueryParameter(UrlConstants.BASE_API, BuildConfig.API_KEY)
                 .build();
+    }
+
+    /**
+     * loggingInterceptor
+     *
+     * @return {@link HttpLoggingInterceptor}
+     */
+    private static HttpLoggingInterceptor loggingInterceptor() {
+        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        return loggingInterceptor;
     }
 }

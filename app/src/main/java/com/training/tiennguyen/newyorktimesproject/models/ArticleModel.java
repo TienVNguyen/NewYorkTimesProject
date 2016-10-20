@@ -7,6 +7,8 @@
 
 package com.training.tiennguyen.newyorktimesproject.models;
 
+import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
 import org.parceler.Parcel;
@@ -18,8 +20,7 @@ import java.util.List;
  *
  * @author TienVNguyen
  */
-@Parcel(analyze = {ArticleModel.class})
-public class ArticleModel {
+public class ArticleModel implements Parcelable {
 
     @SerializedName("web_url")
     protected String mWebUrl;
@@ -56,6 +57,26 @@ public class ArticleModel {
         this.mPubDate = mPubDate;
     }
 
+    protected ArticleModel(android.os.Parcel in) {
+        mWebUrl = in.readString();
+        mSnippet = in.readString();
+        mLeadParagraph = in.readString();
+        mMultimedia = in.createTypedArrayList(MultimediaModel.CREATOR);
+        mPubDate = in.readString();
+    }
+
+    public static final Creator<ArticleModel> CREATOR = new Creator<ArticleModel>() {
+        @Override
+        public ArticleModel createFromParcel(android.os.Parcel in) {
+            return new ArticleModel(in);
+        }
+
+        @Override
+        public ArticleModel[] newArray(int size) {
+            return new ArticleModel[size];
+        }
+    };
+
     public String getmWebUrl() {
         return mWebUrl;
     }
@@ -74,5 +95,19 @@ public class ArticleModel {
 
     public String getmPubDate() {
         return mPubDate;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(android.os.Parcel dest, int flags) {
+        dest.writeString(mWebUrl);
+        dest.writeString(mSnippet);
+        dest.writeString(mLeadParagraph);
+        dest.writeTypedList(mMultimedia);
+        dest.writeString(mPubDate);
     }
 }

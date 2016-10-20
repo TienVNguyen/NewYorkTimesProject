@@ -29,5 +29,5 @@ public interface ArticleAPI {
      * @return {@link Call<SearchResultModel>}
      */
     @GET("articlesearch.json")
-    Call<SearchResultModel> getArticles(final @QueryMap(encoded = true) LinkedHashMap queryMap);
+    Call<SearchResultModel> getArticles(final @QueryMap(encoded = true) LinkedHashMap<String, String> queryMap);
 }

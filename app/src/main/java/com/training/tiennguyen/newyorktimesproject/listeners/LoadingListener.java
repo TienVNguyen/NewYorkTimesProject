@@ -10,10 +10,16 @@ package com.training.tiennguyen.newyorktimesproject.listeners;
 import com.training.tiennguyen.newyorktimesproject.models.SearchResultModel;
 
 /**
- * {@link ResultListener}
+ * {@link LoadingListener}
  *
  * @author TienVNguyen
  */
-public interface ResultListener {
-    void onResult(SearchResultModel body);
+public interface LoadingListener {
+
+    /**
+     * onLoading
+     *
+     * @param body {@link SearchResultModel}
+     */
+    void onLoading(final SearchResultModel body);
 }

@@ -7,7 +7,10 @@
 
 package com.training.tiennguyen.newyorktimesproject.models;
 
+import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
+import com.training.tiennguyen.newyorktimesproject.constants.UrlConstants;
 
 import org.parceler.Parcel;
 
@@ -16,8 +19,7 @@ import org.parceler.Parcel;
  *
  * @author TienVNguyen
  */
-@Parcel(analyze = {MultimediaModel.class})
-public class MultimediaModel {
+public class MultimediaModel implements Parcelable {
 
     @SerializedName("width")
     protected int mWidth;
@@ -29,12 +31,6 @@ public class MultimediaModel {
     protected String mSubtype;
     @SerializedName("type")
     protected String mType;
-
-    /**
-     * Empty constructor needed by the {@link Parcel} library
-     */
-    public MultimediaModel() {
-    }
 
     /**
      * Full Constructor
@@ -55,12 +51,32 @@ public class MultimediaModel {
         this.mType = mType;
     }
 
+    private MultimediaModel(android.os.Parcel in) {
+        mWidth = in.readInt();
+        mUrl = in.readString();
+        mHeight = in.readInt();
+        mSubtype = in.readString();
+        mType = in.readString();
+    }
+
+    public static final Creator<MultimediaModel> CREATOR = new Creator<MultimediaModel>() {
+        @Override
+        public MultimediaModel createFromParcel(android.os.Parcel in) {
+            return new MultimediaModel(in);
+        }
+
+        @Override
+        public MultimediaModel[] newArray(int size) {
+            return new MultimediaModel[size];
+        }
+    };
+
     public int getmWidth() {
         return mWidth;
     }
 
     public String getmUrl() {
-        return mUrl;
+        return UrlConstants.STATIC_BASE_URL + mUrl;
     }
 
     public int getmHeight() {
@@ -73,5 +89,19 @@ public class MultimediaModel {
 
     public String getmType() {
         return mType;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(android.os.Parcel dest, int flags) {
+        dest.writeInt(mWidth);
+        dest.writeString(mUrl);
+        dest.writeInt(mHeight);
+        dest.writeString(mSubtype);
+        dest.writeString(mType);
     }
 }

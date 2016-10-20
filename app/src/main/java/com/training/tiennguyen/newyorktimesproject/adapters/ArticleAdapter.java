@@ -16,6 +16,7 @@ import com.bumptech.glide.Glide;
 import com.training.tiennguyen.newyorktimesproject.R;
 import com.training.tiennguyen.newyorktimesproject.holders.ArticleHolder1;
 import com.training.tiennguyen.newyorktimesproject.holders.ArticleHolder2;
+import com.training.tiennguyen.newyorktimesproject.listeners.LoadingMoreListener;
 import com.training.tiennguyen.newyorktimesproject.models.ArticleModel;
 
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private final int NORMAL = 0;
     private final int NO_IMAGE = 1;
     private List<ArticleModel> mArticles;
+    private LoadingMoreListener mLoadingMoreListener;
 
     /**
      * Constructor
@@ -38,15 +40,19 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         this.mArticles = new ArrayList<>();
     }
 
-    public void setArticles(List<ArticleModel> mArticles) {
+    public void setArticles(final List<ArticleModel> mArticles) {
         this.mArticles.clear();
         this.mArticles.addAll(mArticles);
         notifyDataSetChanged();
     }
 
-    public void setMoreArticles(List<ArticleModel> mArticles) {
+    public void setMoreArticles(final List<ArticleModel> mArticles) {
         this.mArticles.addAll(mArticles);
-        notifyItemRangeChanged(mArticles.size() - 1, this.mArticles.size());
+        notifyItemRangeChanged(getItemCount() - 1, mArticles.size());
+    }
+
+    public void setLoadingMoreListener(final LoadingMoreListener mLoadingMoreListener) {
+        this.mLoadingMoreListener = mLoadingMoreListener;
     }
 
     @Override
@@ -71,6 +77,9 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             bindViewHolder2(model, (ArticleHolder2) holder);
         }
 
+        if (position == mArticles.size() - 1 && null != mLoadingMoreListener) {
+            mLoadingMoreListener.onLoadMore();
+        }
     }
 
     private void bindViewHolder1(ArticleModel model, ArticleHolder1 holder) {

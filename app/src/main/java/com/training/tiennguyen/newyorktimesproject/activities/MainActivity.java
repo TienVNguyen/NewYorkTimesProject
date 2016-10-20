@@ -12,12 +12,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
+import android.view.View;
 import android.widget.ProgressBar;
 
 import com.training.tiennguyen.newyorktimesproject.R;
 import com.training.tiennguyen.newyorktimesproject.adapters.ArticleAdapter;
 import com.training.tiennguyen.newyorktimesproject.apis.ArticleAPI;
-import com.training.tiennguyen.newyorktimesproject.listeners.ResultListener;
+import com.training.tiennguyen.newyorktimesproject.listeners.LoadingListener;
+import com.training.tiennguyen.newyorktimesproject.listeners.LoadingMoreListener;
 import com.training.tiennguyen.newyorktimesproject.models.SearchResultModel;
 import com.training.tiennguyen.newyorktimesproject.utils.RetrofitUtil;
 import com.training.tiennguyen.newyorktimesproject.utils.SearchRequest;
@@ -65,31 +67,38 @@ public class MainActivity extends AppCompatActivity {
      */
     private void populateDataForList() {
         mAdapter = new ArticleAdapter();
-        StaggeredGridLayoutManager manager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        mAdapter.setLoadingMoreListener(MainActivity.this::searchMore);
+
         recyclerViewArticles.setAdapter(mAdapter);
-        recyclerViewArticles.setLayoutManager(manager);
+        recyclerViewArticles.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+
+        search();
     }
 
     /**
      * search
      */
     private void search() {
-        fetchArticles(body -> mAdapter.setArticles(body.getmArticles()));
+        fetchArticles(body -> {
+            if (body!= null && body.getmArticles().size() > 0)
+                mAdapter.setArticles(body.getmArticles());
+        });
     }
 
     /**
      * searchMore
      */
     private void searchMore() {
+        progressBarLoading.setVisibility(View.VISIBLE);
         fetchArticles(body -> mAdapter.setMoreArticles(body.getmArticles()));
     }
 
     /**
      * fetchArticles
      *
-     * @param listener {@link ResultListener}
+     * @param listener {@link LoadingListener}
      */
-    private void fetchArticles(final ResultListener listener) {
+    private void fetchArticles(final LoadingListener listener) {
         ArticleAPI api = RetrofitUtil.get().create(ArticleAPI.class);
         api.getArticles(SearchRequest.toQueryMap())
                 .enqueue(new Callback<SearchResultModel>() {
@@ -110,19 +119,21 @@ public class MainActivity extends AppCompatActivity {
      *
      * @param t {@link Throwable}
      */
-    private void onFailureFunction(Throwable t) {
+    private void onFailureFunction(final Throwable t) {
         Log.d("ARTICLE_FAILED", t.getMessage());
     }
 
     /**
      * onResponseFunction
      *
-     * @param listener {@link ResultListener}
+     * @param listener {@link LoadingListener}
      * @param response {@link Response<SearchResultModel>}
      */
-    private void onResponseFunction(ResultListener listener, Response<SearchResultModel> response) {
+    private void onResponseFunction(final LoadingListener listener, final Response<SearchResultModel> response) {
         Log.d("ARTICLE_RESPONSE", String.valueOf(response.isSuccessful()));
 
-        listener.onResult(response.body());
+        listener.onLoading(response.body());
+        progressBarMore.setVisibility(View.GONE);
+        progressBarLoading.setVisibility(View.GONE);
     }
 }

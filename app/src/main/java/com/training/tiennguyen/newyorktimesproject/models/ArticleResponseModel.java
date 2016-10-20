@@ -19,18 +19,20 @@ import org.json.JSONObject;
 public class ArticleResponseModel {
 
     @SerializedName("response")
-    protected JSONObject mResponse;
+    protected JSONObject response;
     @SerializedName("status")
-    protected String mStatus;
+    protected String status;
+    @SerializedName("copyright")
+    protected String copyright;
 
-    public JSONObject getmResponse() {
-        if (mResponse == null) {
+    public JSONObject getResponse() {
+        if (response == null) {
             return new JSONObject();
         }
-        return mResponse;
+        return response;
     }
 
     public String getmStatus() {
-        return mStatus;
+        return status;
     }
 }

@@ -7,6 +7,8 @@
 
 package com.training.tiennguyen.newyorktimesproject.models;
 
+import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
 import org.parceler.Parcel;
@@ -18,8 +20,7 @@ import java.util.List;
  *
  * @author TienVNguyen
  */
-@Parcel(analyze = SearchResultModel.class)
-public class SearchResultModel {
+public class SearchResultModel implements Parcelable{
 
     @SerializedName("docs")
     protected List<ArticleModel> mArticles;
@@ -39,7 +40,33 @@ public class SearchResultModel {
         this.mArticles = mArticles;
     }
 
+    private SearchResultModel(android.os.Parcel in) {
+        mArticles = in.createTypedArrayList(ArticleModel.CREATOR);
+    }
+
+    public static final Creator<SearchResultModel> CREATOR = new Creator<SearchResultModel>() {
+        @Override
+        public SearchResultModel createFromParcel(android.os.Parcel in) {
+            return new SearchResultModel(in);
+        }
+
+        @Override
+        public SearchResultModel[] newArray(int size) {
+            return new SearchResultModel[size];
+        }
+    };
+
     public List<ArticleModel> getmArticles() {
         return mArticles;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(android.os.Parcel dest, int flags) {
+        dest.writeTypedList(mArticles);
     }
 }
