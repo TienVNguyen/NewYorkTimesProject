@@ -26,7 +26,7 @@ public class ConfigurationUtils {
      */
     public static boolean isLandscape(final Context context) {
         final Configuration configuration = context.getResources().getConfiguration();
-        return configuration.orientation == Configuration.ORIENTATION_LANDSCAPE;
+        return Configuration.ORIENTATION_LANDSCAPE == configuration.orientation;
     }
 
     /**
@@ -35,9 +35,9 @@ public class ConfigurationUtils {
      * @param context {@link Context}
      * @return {@link Boolean}
      */
-    public static boolean isConnectInternet(final Context context) {
+    public static boolean isNetworkAvailable(final Context context) {
         final ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         final NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        return networkInfo != null && networkInfo.isConnected();
+        return null != networkInfo && networkInfo.isConnected();
     }
 }

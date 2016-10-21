@@ -7,9 +7,9 @@
 
 package com.training.tiennguyen.newyorktimesproject.models;
 
+import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
 
-import org.json.JSONObject;
 
 /**
  * {@link ArticleResponseModel}
@@ -19,20 +19,24 @@ import org.json.JSONObject;
 public class ArticleResponseModel {
 
     @SerializedName("response")
-    protected JSONObject response;
+    private JsonObject response;
     @SerializedName("status")
-    protected String status;
+    private String status;
     @SerializedName("copyright")
-    protected String copyright;
+    private String copyright;
 
-    public JSONObject getResponse() {
+    public JsonObject getResponse() {
         if (response == null) {
-            return new JSONObject();
+            response = new JsonObject();
         }
         return response;
     }
 
     public String getmStatus() {
         return status;
+    }
+
+    public String getCopyright() {
+        return copyright;
     }
 }

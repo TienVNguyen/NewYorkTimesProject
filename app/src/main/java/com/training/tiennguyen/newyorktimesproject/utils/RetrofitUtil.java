@@ -32,7 +32,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * @author TienVNguyen
  */
 public class RetrofitUtil {
-    private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    private static final MediaType JSON = MediaType.parse(UrlConstants.PARSE_JSON);
     private static final Gson GSON = new Gson();
 
     /**
@@ -57,9 +57,7 @@ public class RetrofitUtil {
         return new OkHttpClient.Builder()
                 .readTimeout(10, TimeUnit.SECONDS)
                 .connectTimeout(10, TimeUnit.SECONDS)
-                .addInterceptor(loggingInterceptor())
                 .addInterceptor(getApiInterceptor())
-                .addInterceptor(loggingInterceptor())
                 .addInterceptor(getInterceptorForResponse())
                 .build();
     }
@@ -102,10 +100,9 @@ public class RetrofitUtil {
      * @return {@link Request}
      */
     private static Response getResponse(Interceptor.Chain chain) throws IOException {
-        final Request request = chain.request();
-        final Response response = chain.proceed(request);
+        final Response response = chain.proceed(chain.request());
         final ResponseBody responseBody = response.body();
-        final ArticleResponseModel articleResponseModel = GSON.fromJson(responseBody.toString(), ArticleResponseModel.class);
+        final ArticleResponseModel articleResponseModel = GSON.fromJson(responseBody.string(), ArticleResponseModel.class);
         responseBody.close();
 
         return response.newBuilder()
@@ -132,7 +129,7 @@ public class RetrofitUtil {
      * @return {@link HttpLoggingInterceptor}
      */
     private static HttpLoggingInterceptor loggingInterceptor() {
-        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+        final HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         return loggingInterceptor;
     }

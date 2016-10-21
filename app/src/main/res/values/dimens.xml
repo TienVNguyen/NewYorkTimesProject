@@ -11,6 +11,9 @@
     <dimen name="activity_vertical_margin">8dp</dimen>
     <dimen name="activity_horizontal_padding">8dp</dimen>
     <dimen name="activity_vertical_padding">8dp</dimen>
+    <dimen name="activity_margin_message">24dp</dimen>
+    <dimen name="activity_padding_message">24dp</dimen>
     <dimen name="card_elevation">6dp</dimen>
     <dimen name="card_layout_width">200dp</dimen>
+    <dimen name="text_size_message">16sp</dimen>
 </resources>

@@ -7,22 +7,31 @@
 
 package com.training.tiennguyen.newyorktimesproject.activities;
 
+import android.app.Dialog;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.training.tiennguyen.newyorktimesproject.R;
 import com.training.tiennguyen.newyorktimesproject.adapters.ArticleAdapter;
 import com.training.tiennguyen.newyorktimesproject.apis.ArticleAPI;
 import com.training.tiennguyen.newyorktimesproject.listeners.LoadingListener;
-import com.training.tiennguyen.newyorktimesproject.listeners.LoadingMoreListener;
+import com.training.tiennguyen.newyorktimesproject.models.SearchRequestModel;
 import com.training.tiennguyen.newyorktimesproject.models.SearchResultModel;
+import com.training.tiennguyen.newyorktimesproject.utils.ConfigurationUtils;
 import com.training.tiennguyen.newyorktimesproject.utils.RetrofitUtil;
-import com.training.tiennguyen.newyorktimesproject.utils.SearchRequest;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -36,6 +45,10 @@ import retrofit2.Response;
  * @author TienVNguyen
  */
 public class MainActivity extends AppCompatActivity {
+    @BindView(R.id.swipeRefreshLayoutMain)
+    protected SwipeRefreshLayout swipeRefreshLayoutMain;
+    @BindView(R.id.relativeLayoutLoading)
+    protected RelativeLayout relativeLayoutLoading;
     @BindView(R.id.progressBarLoading)
     protected ProgressBar progressBarLoading;
     @BindView(R.id.progressBarMore)
@@ -43,13 +56,79 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.recyclerViewArticles)
     protected RecyclerView recyclerViewArticles;
 
+    private SearchView mSearchView;
+    private Dialog myDialog;
+    private ArticleAPI mArticleAPI;
     private ArticleAdapter mAdapter;
+    private SearchRequestModel mSearchRequest = new SearchRequestModel();
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        final MenuItem searchItem = menu.findItem(R.id.action_search);
+        setupSearchViewMenu(searchItem);
+        MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                mSearchRequest.setmQuery(null);
+                search(false);
+                return true;
+            }
+        });
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    /**
+     * setupSearchViewMenu
+     *
+     * @param searchItem {@link MenuItem}
+     */
+    private void setupSearchViewMenu(final MenuItem searchItem) {
+        mSearchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                mSearchRequest.setmQuery(query);
+                search(false);
+                mSearchView.clearFocus();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_filter:
+                Toast.makeText(this, "Filter_OPTION", Toast.LENGTH_SHORT).show();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         initViews();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        search(false);
     }
 
     /**
@@ -59,28 +138,72 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        populateDataForList();
+        setUpAPI();
+        setUpAdapter();
+        setUpWipeRefreshLayout();
+        setUpRecyclerView();
+
+        mSearchRequest.resetPage();
     }
 
     /**
-     * populateDataForList
+     * setUpAPI
      */
-    private void populateDataForList() {
+    private void setUpAPI() {
+        mArticleAPI = RetrofitUtil.get().create(ArticleAPI.class);
+    }
+
+    /**
+     * setUpAdapter
+     */
+    private void setUpAdapter() {
         mAdapter = new ArticleAdapter();
         mAdapter.setLoadingMoreListener(MainActivity.this::searchMore);
+    }
 
+    /**
+     * setUpWipeRefreshLayout
+     */
+    private void setUpWipeRefreshLayout() {
+        swipeRefreshLayoutMain.setOnRefreshListener(() -> MainActivity.this.search(true));
+        swipeRefreshLayoutMain.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+    }
+
+    /**
+     * setUpRecyclerView
+     */
+    private void setUpRecyclerView() {
+        final int spanCount = ConfigurationUtils.isLandscape(MainActivity.this) ? 4 : 2;
+        final StaggeredGridLayoutManager manager = new StaggeredGridLayoutManager(
+                spanCount, StaggeredGridLayoutManager.VERTICAL);
+        recyclerViewArticles.setLayoutManager(manager);
         recyclerViewArticles.setAdapter(mAdapter);
-        recyclerViewArticles.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-
-        search();
     }
 
     /**
      * search
+     *
+     * @param isWipe {@link Boolean}
      */
-    private void search() {
+    private void search(final boolean isWipe) {
+        if (!ConfigurationUtils.isNetworkAvailable(MainActivity.this)) {
+            dialogMessageForInternetRequest();
+        } else {
+            if (null != myDialog)
+                myDialog.dismiss();
+            swipeRefreshLayoutMain.setRefreshing(false);
+        }
+
+        if (!isWipe) {
+            progressBarLoading.setVisibility(View.VISIBLE);
+            relativeLayoutLoading.setVisibility(View.VISIBLE);
+        }
+
         fetchArticles(body -> {
-            if (body!= null && body.getmArticles().size() > 0)
+            if (body != null && body.getmArticles().size() > 0)
                 mAdapter.setArticles(body.getmArticles());
         });
     }
@@ -89,8 +212,31 @@ public class MainActivity extends AppCompatActivity {
      * searchMore
      */
     private void searchMore() {
-        progressBarLoading.setVisibility(View.VISIBLE);
-        fetchArticles(body -> mAdapter.setMoreArticles(body.getmArticles()));
+        if (!ConfigurationUtils.isNetworkAvailable(MainActivity.this)) {
+            dialogMessageForInternetRequest();
+        }
+
+        progressBarMore.setVisibility(View.VISIBLE);
+
+        mSearchRequest.nextPage();
+
+        fetchArticles(body -> {
+            if (body != null && body.getmArticles().size() > 0)
+                mAdapter.setMoreArticles(body.getmArticles());
+        });
+    }
+
+    /**
+     * dialogMessageForInternetRequest
+     */
+    private void dialogMessageForInternetRequest() {
+        myDialog = new Dialog(MainActivity.this);
+        myDialog.setContentView(R.layout.dialog_connection);
+        myDialog.setTitle(getString(R.string.connection_error_title));
+        myDialog.setCancelable(false);
+        final Button buttonRetry = (Button) myDialog.findViewById(R.id.buttonConnection);
+        buttonRetry.setOnClickListener(v -> search(false));
+        myDialog.show();
     }
 
     /**
@@ -99,8 +245,7 @@ public class MainActivity extends AppCompatActivity {
      * @param listener {@link LoadingListener}
      */
     private void fetchArticles(final LoadingListener listener) {
-        ArticleAPI api = RetrofitUtil.get().create(ArticleAPI.class);
-        api.getArticles(SearchRequest.toQueryMap())
+        mArticleAPI.getArticles(mSearchRequest.toQueryMap())
                 .enqueue(new Callback<SearchResultModel>() {
                     @Override
                     public void onResponse(Call<SearchResultModel> call, Response<SearchResultModel> response) {
@@ -132,8 +277,12 @@ public class MainActivity extends AppCompatActivity {
     private void onResponseFunction(final LoadingListener listener, final Response<SearchResultModel> response) {
         Log.d("ARTICLE_RESPONSE", String.valueOf(response.isSuccessful()));
 
-        listener.onLoading(response.body());
+        if (response.isSuccessful())
+            listener.onLoading(response.body());
+
+        swipeRefreshLayoutMain.setRefreshing(false);
         progressBarMore.setVisibility(View.GONE);
         progressBarLoading.setVisibility(View.GONE);
+        relativeLayoutLoading.setVisibility(View.GONE);
     }
 }

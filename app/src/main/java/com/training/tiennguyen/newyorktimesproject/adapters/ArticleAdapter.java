@@ -29,7 +29,6 @@ import java.util.List;
  */
 public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final int NORMAL = 0;
-    private final int NO_IMAGE = 1;
     private List<ArticleModel> mArticles;
     private LoadingMoreListener mLoadingMoreListener;
 
@@ -40,17 +39,32 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         this.mArticles = new ArrayList<>();
     }
 
+    /**
+     * setArticles
+     *
+     * @param mArticles {@link List<ArticleModel>}
+     */
     public void setArticles(final List<ArticleModel> mArticles) {
         this.mArticles.clear();
         this.mArticles.addAll(mArticles);
         notifyDataSetChanged();
     }
 
+    /**
+     * setMoreArticles
+     *
+     * @param mArticles {@link List<ArticleModel>}
+     */
     public void setMoreArticles(final List<ArticleModel> mArticles) {
         this.mArticles.addAll(mArticles);
         notifyItemRangeChanged(getItemCount() - 1, mArticles.size());
     }
 
+    /**
+     * setLoadingMoreListener
+     *
+     * @param mLoadingMoreListener {@link LoadingMoreListener}
+     */
     public void setLoadingMoreListener(final LoadingMoreListener mLoadingMoreListener) {
         this.mLoadingMoreListener = mLoadingMoreListener;
     }
@@ -82,13 +96,26 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
 
+    /**
+     * bindViewHolder1
+     *
+     * @param model  {@link ArticleModel}
+     * @param holder {@link ArticleHolder1}
+     */
     private void bindViewHolder1(ArticleModel model, ArticleHolder1 holder) {
         holder.textViewSnippet.setText(model.getmSnippet());
         Glide.with(holder.itemView.getContext())
                 .load(model.getmMultimedia().get(0).getmUrl())
+                .placeholder(R.drawable.image_placeholder)
                 .into(holder.imageViewMultimedia);
     }
 
+    /**
+     * bindViewHolder2
+     *
+     * @param model  {@link ArticleModel}
+     * @param holder {@link ArticleHolder2}
+     */
     private void bindViewHolder2(ArticleModel model, ArticleHolder2 holder) {
         holder.textViewSnippet.setText(model.getmSnippet());
     }
@@ -102,7 +129,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public int getItemViewType(int position) {
         final ArticleModel model = mArticles.get(position);
         if (null == model.getmMultimedia() || model.getmMultimedia().isEmpty())
-            return NO_IMAGE;
+            return 1;
         return NORMAL;
     }
 }

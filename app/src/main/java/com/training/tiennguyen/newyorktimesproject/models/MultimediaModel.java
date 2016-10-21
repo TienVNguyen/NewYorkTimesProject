@@ -7,8 +7,6 @@
 
 package com.training.tiennguyen.newyorktimesproject.models;
 
-import android.os.Parcelable;
-
 import com.google.gson.annotations.SerializedName;
 import com.training.tiennguyen.newyorktimesproject.constants.UrlConstants;
 
@@ -19,18 +17,25 @@ import org.parceler.Parcel;
  *
  * @author TienVNguyen
  */
-public class MultimediaModel implements Parcelable {
+@Parcel
+public class MultimediaModel {
 
     @SerializedName("width")
-    protected int mWidth;
+    int mWidth;
     @SerializedName("url")
-    protected String mUrl;
+    String mUrl;
     @SerializedName("height")
-    protected int mHeight;
+    int mHeight;
     @SerializedName("subtype")
-    protected String mSubtype;
+    String mSubtype;
     @SerializedName("type")
-    protected String mType;
+    String mType;
+
+    /**
+     * Empty constructor needed by the {@link Parcel} library
+     */
+    MultimediaModel() {
+    }
 
     /**
      * Full Constructor
@@ -51,26 +56,6 @@ public class MultimediaModel implements Parcelable {
         this.mType = mType;
     }
 
-    private MultimediaModel(android.os.Parcel in) {
-        mWidth = in.readInt();
-        mUrl = in.readString();
-        mHeight = in.readInt();
-        mSubtype = in.readString();
-        mType = in.readString();
-    }
-
-    public static final Creator<MultimediaModel> CREATOR = new Creator<MultimediaModel>() {
-        @Override
-        public MultimediaModel createFromParcel(android.os.Parcel in) {
-            return new MultimediaModel(in);
-        }
-
-        @Override
-        public MultimediaModel[] newArray(int size) {
-            return new MultimediaModel[size];
-        }
-    };
-
     public int getmWidth() {
         return mWidth;
     }
@@ -89,19 +74,5 @@ public class MultimediaModel implements Parcelable {
 
     public String getmType() {
         return mType;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(android.os.Parcel dest, int flags) {
-        dest.writeInt(mWidth);
-        dest.writeString(mUrl);
-        dest.writeInt(mHeight);
-        dest.writeString(mSubtype);
-        dest.writeString(mType);
     }
 }

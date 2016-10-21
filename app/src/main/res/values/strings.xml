@@ -8,4 +8,9 @@
 <resources>
     <string name="app_name">New York Times Project</string>
     <string name="image_description">Image Description</string>
+    <string name="connection_error_title">Connection Issue</string>
+    <string name="connection_error_message">Unable to connect to the Internet. Please check your connection</string>
+    <string name="connection_error_button">Try Again</string>
+    <string name="menu_search">Search</string>
+    <string name="menu_filter">Filter</string>
 </resources>

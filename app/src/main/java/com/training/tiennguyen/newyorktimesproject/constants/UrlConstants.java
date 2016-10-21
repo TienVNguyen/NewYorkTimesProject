@@ -30,6 +30,11 @@ public class UrlConstants {
     public final static String STATIC_BASE_URL = "http://www.nytimes.com/";
 
     /**
+     * PARSE_JSON
+     */
+    public final static String PARSE_JSON = "application/json; charset=utf-8";
+
+    /**
      * BEGIN_DATE
      */
     public static final String BEGIN_DATE = "begin_date";
@@ -45,9 +50,9 @@ public class UrlConstants {
     public static final String FQ = "fq";
 
     /**
-     * query
+     * Q
      */
-    public static final String QUERY = "query";
+    public static final String Q = "q";
 
     /**
      * PAGE
