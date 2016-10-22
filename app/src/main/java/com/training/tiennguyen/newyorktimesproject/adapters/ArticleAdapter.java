@@ -91,7 +91,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             bindViewHolder2(model, (ArticleHolder2) holder);
         }
 
-        if (position == mArticles.size() - 1 && null != mLoadingMoreListener) {
+        if (position == (mArticles.size() - 1) && null != mLoadingMoreListener) {
             mLoadingMoreListener.onLoadMore();
         }
     }
@@ -117,7 +117,10 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
      * @param holder {@link ArticleHolder2}
      */
     private void bindViewHolder2(ArticleModel model, ArticleHolder2 holder) {
-        holder.textViewSnippet.setText(model.getmSnippet());
+        if (null != model.getmSnippet() || 0 < model.getmSnippet().length())
+            holder.textViewSnippet.setText(model.getmSnippet());
+        else
+            holder.textViewSnippet.setVisibility(View.GONE);
     }
 
     @Override

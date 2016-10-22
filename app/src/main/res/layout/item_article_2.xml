@@ -28,6 +28,7 @@
             android:ellipsize="end"
             android:maxLines="3"
             android:padding="@dimen/activity_horizontal_padding"
+            android:textStyle="italic"
             tools:text="@string/image_description" />
     </LinearLayout>
 </android.support.v7.widget.CardView>

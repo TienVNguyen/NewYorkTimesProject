@@ -16,4 +16,5 @@
     <dimen name="card_elevation">6dp</dimen>
     <dimen name="card_layout_width">200dp</dimen>
     <dimen name="text_size_message">16sp</dimen>
+    <dimen name="text_size_message_title">24sp</dimen>
 </resources>

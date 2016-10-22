@@ -17,4 +17,12 @@ public class IntentConstants {
      * SPLASH_TIME_OUT
      */
     public final static int SPLASH_TIME_OUT = 1000;
+    /**
+     * DIALOG_FILTER_TAG
+     */
+    public final static String DIALOG_FILTER_TAG = "dialog_filter";
+    /**
+     * DIALOG_FILTER_TITLE
+     */
+    public final static String DIALOG_FILTER_TITLE = "DIALOG_FILTER_TITLE";
 }

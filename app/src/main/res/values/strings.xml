@@ -10,7 +10,19 @@
     <string name="image_description">Image Description</string>
     <string name="connection_error_title">Connection Issue</string>
     <string name="connection_error_message">Unable to connect to the Internet. Please check your connection</string>
-    <string name="connection_error_button">Try Again</string>
     <string name="menu_search">Search</string>
     <string name="menu_filter">Filter</string>
+    <string name="button_try_again">Try Again</string>
+    <string name="button_save">Save</string>
+    <string name="text_begin_date">Begin Date</string>
+    <string name="text_sort_order">Sort Order</string>
+    <string name="text_news_desk_values">News Desk Values</string>
+    <string name="text_arts">Arts</string>
+    <string name="text_fashion_style"><![CDATA[Fashion & Style]]></string>
+    <string name="text_sports">Sports</string>
+    <string name="text_advanced_search_filters">Advanced Search Filters</string>
+    <string-array name="spinner_sort_order">
+        <item>Oldest</item>
+        <item>Newest</item>
+    </string-array>
 </resources>

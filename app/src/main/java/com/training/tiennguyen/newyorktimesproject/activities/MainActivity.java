@@ -9,6 +9,7 @@ package com.training.tiennguyen.newyorktimesproject.activities;
 
 import android.app.Dialog;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -27,6 +28,9 @@ import android.widget.Toast;
 import com.training.tiennguyen.newyorktimesproject.R;
 import com.training.tiennguyen.newyorktimesproject.adapters.ArticleAdapter;
 import com.training.tiennguyen.newyorktimesproject.apis.ArticleAPI;
+import com.training.tiennguyen.newyorktimesproject.constants.IntentConstants;
+import com.training.tiennguyen.newyorktimesproject.fragments.FilterDialogFragment;
+import com.training.tiennguyen.newyorktimesproject.listeners.FilterDialogListener;
 import com.training.tiennguyen.newyorktimesproject.listeners.LoadingListener;
 import com.training.tiennguyen.newyorktimesproject.models.SearchRequestModel;
 import com.training.tiennguyen.newyorktimesproject.models.SearchResultModel;
@@ -44,7 +48,7 @@ import retrofit2.Response;
  *
  * @author TienVNguyen
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements FilterDialogListener {
     @BindView(R.id.swipeRefreshLayoutMain)
     protected SwipeRefreshLayout swipeRefreshLayoutMain;
     @BindView(R.id.relativeLayoutLoading)
@@ -61,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
     private ArticleAPI mArticleAPI;
     private ArticleAdapter mAdapter;
     private SearchRequestModel mSearchRequest = new SearchRequestModel();
+    private FragmentManager mFragmentManager = getSupportFragmentManager();
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -111,10 +116,16 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_filter:
-                Toast.makeText(this, "Filter_OPTION", Toast.LENGTH_SHORT).show();
+                FilterDialogFragment filterDialogFragment = FilterDialogFragment.newInstance(mSearchRequest);
+                filterDialogFragment.show(mFragmentManager, IntentConstants.DIALOG_FILTER_TAG);
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onFinishFilterDialog(SearchRequestModel searchRequestModel) {
+        Toast.makeText(this, "Test", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -181,6 +192,7 @@ public class MainActivity extends AppCompatActivity {
                 spanCount, StaggeredGridLayoutManager.VERTICAL);
         recyclerViewArticles.setLayoutManager(manager);
         recyclerViewArticles.setAdapter(mAdapter);
+        recyclerViewArticles.setHasFixedSize(true);
     }
 
     /**
@@ -190,11 +202,11 @@ public class MainActivity extends AppCompatActivity {
      */
     private void search(final boolean isWipe) {
         if (!ConfigurationUtils.isNetworkAvailable(MainActivity.this)) {
-            dialogMessageForInternetRequest();
+            dialogMessageForInternetRequest(false);
         } else {
+            swipeRefreshLayoutMain.setRefreshing(false);
             if (null != myDialog)
                 myDialog.dismiss();
-            swipeRefreshLayoutMain.setRefreshing(false);
         }
 
         if (!isWipe) {
@@ -213,7 +225,11 @@ public class MainActivity extends AppCompatActivity {
      */
     private void searchMore() {
         if (!ConfigurationUtils.isNetworkAvailable(MainActivity.this)) {
-            dialogMessageForInternetRequest();
+            dialogMessageForInternetRequest(true);
+        } else {
+            swipeRefreshLayoutMain.setRefreshing(false);
+            if (null != myDialog)
+                myDialog.dismiss();
         }
 
         progressBarMore.setVisibility(View.VISIBLE);
@@ -228,14 +244,21 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * dialogMessageForInternetRequest
+     *
+     * @param isSearchMore {@link Boolean}
      */
-    private void dialogMessageForInternetRequest() {
+    private void dialogMessageForInternetRequest(final boolean isSearchMore) {
         myDialog = new Dialog(MainActivity.this);
         myDialog.setContentView(R.layout.dialog_connection);
         myDialog.setTitle(getString(R.string.connection_error_title));
         myDialog.setCancelable(false);
         final Button buttonRetry = (Button) myDialog.findViewById(R.id.buttonConnection);
-        buttonRetry.setOnClickListener(v -> search(false));
+        buttonRetry.setOnClickListener(v -> {
+            if (isSearchMore)
+                MainActivity.this.searchMore();
+            else
+                MainActivity.this.search(false);
+        });
         myDialog.show();
     }
 

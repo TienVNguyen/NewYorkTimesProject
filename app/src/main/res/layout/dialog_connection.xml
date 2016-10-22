@@ -26,7 +26,7 @@
         android:layout_centerHorizontal="true"
         android:layout_margin="@dimen/activity_margin_message"
         android:padding="@dimen/activity_padding_message"
-        android:text="@string/connection_error_button"
+        android:text="@string/button_try_again"
         android:textAllCaps="true"
         android:textStyle="bold" />
 </RelativeLayout>
