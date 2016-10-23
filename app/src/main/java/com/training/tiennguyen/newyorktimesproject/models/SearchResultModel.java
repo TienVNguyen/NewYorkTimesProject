@@ -18,7 +18,7 @@ import java.util.List;
  *
  * @author TienVNguyen
  */
-@Parcel
+@Parcel(analyze = {SearchResultModel.class})
 public class SearchResultModel {
 
     @SerializedName("docs")

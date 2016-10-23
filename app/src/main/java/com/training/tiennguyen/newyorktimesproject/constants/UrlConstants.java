@@ -58,4 +58,19 @@ public class UrlConstants {
      * PAGE
      */
     public static final String PAGE = "page";
+
+    /**
+     * FQ_ARTS
+     */
+    public static final String FQ_ARTS = "Arts";
+
+    /**
+     * FQ_FASHION_STYLE
+     */
+    public static final String FQ_FASHION_STYLE = "Fashion & Style";
+
+    /**
+     * FQ_SPORTS
+     */
+    public static final String FQ_SPORTS = "Sports";
 }

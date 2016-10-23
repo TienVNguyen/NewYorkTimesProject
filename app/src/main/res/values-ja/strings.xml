@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2016. Self Training Systems, Inc - All Rights Reserved
   ~ Unauthorized copying of this file, via any medium is strictly prohibited
   ~ Proprietary and confidential
@@ -9,4 +8,23 @@
 <resources>
     <string name="app_name">ニューヨーク・タイムズ紙プロジェクト</string>
     <string name="image_description">画像記述</string>
+    <string name="connection_error_title">接続に関する問題</string>
+    <string name="connection_error_message">インターネットに接続することができません。あなたの接続</string>
+    <string name="menu_search">検索</string>
+    <string name="menu_filter">フィルタ</string>
+    <string name="menu_share">共有</string>
+    <string name="button_try_again">再試行</string>
+    <string name="button_save">保存</string>
+    <string name="text_begin_date">開始日</string>
+    <string name="text_sort_order">並べ替え順序</string>
+    <string name="text_news_desk_values">ニュースデスク値</string>
+    <string name="text_arts">芸術</string>
+    <string name="text_fashion_style"><![CDATA[ファッション＆スタイル]]></string>
+    <string name="text_sports">スポーツ</string>
+    <string name="text_advanced_search_filters">詳細検索フィルタ</string>
+    <string name="text_no_more_data">をロードするためのより多くのデータがありません</string>
+    <string-array name="spinner_sort_order">
+        <item>Newest</item>
+        <item>Oldest</item>
+    </string-array>
 </resources>

@@ -18,6 +18,7 @@ import android.net.NetworkInfo;
  * @author TienVNguyen
  */
 public class ConfigurationUtils {
+
     /**
      * Check orientation
      *

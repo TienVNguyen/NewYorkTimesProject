@@ -12,28 +12,32 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.text.InputType;
-import android.view.KeyEvent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
-import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckedTextView;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.training.tiennguyen.newyorktimesproject.R;
+import com.training.tiennguyen.newyorktimesproject.constants.DataConstants;
 import com.training.tiennguyen.newyorktimesproject.constants.IntentConstants;
 import com.training.tiennguyen.newyorktimesproject.listeners.FilterDialogListener;
 import com.training.tiennguyen.newyorktimesproject.models.SearchRequestModel;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * {@link FilterDialogFragment}
@@ -41,13 +45,21 @@ import java.util.Locale;
  * @author TienVNguyen
  */
 public class FilterDialogFragment extends DialogFragment {
-    private EditText mEditText;
-    private Spinner mSpinnerSortOrder;
-    private CheckedTextView mCheckedTextViewArts, mCheckedTextViewFashionStyle, mCheckedTextViewSports;
-    private Button mButtonSave;
-    private DatePickerDialog mDatePickerDialog;
-    private SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
     private static SearchRequestModel mSearchRequestModel;
+    @BindView(R.id.editTaskStartedSelect)
+    protected EditText mEditText;
+    @BindView(R.id.spinnerSortOrder)
+    protected Spinner mSpinnerSortOrder;
+    @BindView(R.id.checkedTextViewArts)
+    protected CheckBox mCheckedTextViewArts;
+    @BindView(R.id.checkedTextViewFashionStyle)
+    protected CheckBox mCheckedTextViewFashionStyle;
+    @BindView(R.id.checkedTextViewSports)
+    protected CheckBox mCheckedTextViewSports;
+    @BindView(R.id.buttonSave)
+    protected Button mButtonSave;
+    private DatePickerDialog mDatePickerDialog;
+    private SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat(DataConstants.DATE_FORMAT, Locale.getDefault());
 
     /**
      * Empty constructor is required for {@link DialogFragment}
@@ -58,15 +70,16 @@ public class FilterDialogFragment extends DialogFragment {
     /**
      * newInstance
      *
-     * @param searchRequestModel {@link SearchRequestModel}
+     * @param requestModel {@link SearchRequestModel}
+     * @param title        {@link String}
      * @return {@link FilterDialogFragment}
      */
-    public static FilterDialogFragment newInstance(final SearchRequestModel searchRequestModel) {
-        mSearchRequestModel = searchRequestModel;
+    public static FilterDialogFragment newInstance(final SearchRequestModel requestModel, final String title) {
+        mSearchRequestModel = requestModel;
 
         final FilterDialogFragment frag = new FilterDialogFragment();
         final Bundle args = new Bundle();
-        args.putString(IntentConstants.DIALOG_FILTER_TITLE, "Title");
+        args.putString(IntentConstants.DIALOG_FILTER_TITLE, title);
         frag.setArguments(args);
         return frag;
     }
@@ -75,40 +88,64 @@ public class FilterDialogFragment extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.dialog_filter, container);
+        final View view = inflater.inflate(R.layout.dialog_filter, container);
+        ButterKnife.bind(this, view);
+        return view;
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mEditText = (EditText) view.findViewById(R.id.editTaskStartedSelect);
-        mSpinnerSortOrder = (Spinner) view.findViewById(R.id.spinnerSortOrder);
-        mCheckedTextViewArts = (CheckedTextView) view.findViewById(R.id.checkedTextViewArts);
-        mCheckedTextViewFashionStyle = (CheckedTextView) view.findViewById(R.id.checkedTextViewFashionStyle);
-        mCheckedTextViewSports = (CheckedTextView) view.findViewById(R.id.checkedTextViewSports);
-        mButtonSave = (Button) view.findViewById(R.id.buttonSave);
-
-        //setUpDatePicker();
+        setUpDialogConfig();
+        setUpDatePicker();
         setUpSpinner();
-        mButtonSave.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (EditorInfo.IME_ACTION_DONE == actionId) {
-                    FilterDialogListener listener = (FilterDialogListener) getActivity();
-                    listener.onFinishFilterDialog(mSearchRequestModel);
-                    dismiss();
-                    return true;
+        setUpCheckbox();
+        setUpSaveButton();
+    }
+
+    /**
+     * setUpDialogConfig
+     */
+    private void setUpDialogConfig() {
+        getDialog().setTitle(
+                getArguments().getString(
+                        IntentConstants.DIALOG_FILTER_TITLE,
+                        getString(R.string.text_advanced_search_filters)));
+        final Window window = getDialog().getWindow();
+        if (null != window)
+            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+    }
+
+    /**
+     * setUpSaveButton
+     */
+    private void setUpSaveButton() {
+        mButtonSave.setOnClickListener(view1 -> {
+                    onSaveRequest();
+                    onSaveDialogDismiss();
                 }
-                return false;
-            }
-        });
+        );
+    }
 
-        getDialog().setTitle(getArguments()
-                .getString(IntentConstants.DIALOG_FILTER_TITLE, getString(R.string.text_advanced_search_filters)));
+    /**
+     * onSaveRequest
+     */
+    private void onSaveRequest() {
+        mSearchRequestModel.setmBeginDate(mEditText.getText().toString());
+        mSearchRequestModel.setmSort(mSpinnerSortOrder.getSelectedItem().toString());
+        mSearchRequestModel.setmArts(mCheckedTextViewArts.isChecked());
+        mSearchRequestModel.setmFashionStyle(mCheckedTextViewFashionStyle.isChecked());
+        mSearchRequestModel.setmSports(mCheckedTextViewSports.isChecked());
+    }
 
-        mEditText.requestFocus();
-        getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+    /**
+     * onSaveDialogDismiss
+     */
+    private void onSaveDialogDismiss() {
+        final FilterDialogListener listener = (FilterDialogListener) getActivity();
+        listener.onFinishFilterDialog(mSearchRequestModel);
+        this.dismiss();
     }
 
     /**
@@ -116,36 +153,52 @@ public class FilterDialogFragment extends DialogFragment {
      */
     private void setUpDatePicker() {
         final Date currentDate = new Date();
-        final Date startedDate = new Date(); //taskModel.getmStartedDate();TODO
+        final Calendar newCalendar = Calendar.getInstance();
+        final String beginDate = mSearchRequestModel.getmBeginDate();
 
-        mEditText.setText(mSimpleDateFormat.format(startedDate));
+        if (null != beginDate && 0 < beginDate.length()) {
+            try {
+                final Date startedDate = mSimpleDateFormat.parse(beginDate);
+                mEditText.setText(mSimpleDateFormat.format(startedDate));
+            } catch (ParseException e) {
+                Log.e("ERROR_PARSE_DIALOG", e.getMessage());
+            }
+        }
+
         mEditText.setInputType(InputType.TYPE_NULL);
-        mEditText.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus)
-                mDatePickerDialog.show();
-            v.clearFocus();
+        mEditText.setOnClickListener(view -> mDatePickerDialog.show());
+        mEditText.setOnLongClickListener(view -> {
+            mEditText.setText("");
+            return false;
         });
 
-
-        final Calendar newCalendar = Calendar.getInstance();
         mDatePickerDialog = new DatePickerDialog(getContext(), (view, year, month, dayOfMonth) -> {
             final Calendar newDate = Calendar.getInstance();
             newDate.set(year, month, dayOfMonth);
             mEditText.setText(mSimpleDateFormat.format(newDate.getTime()));
+            mDatePickerDialog.dismiss();
         }, newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH));
-        mDatePickerDialog.getDatePicker().setMinDate(currentDate.getTime());
-
+        mDatePickerDialog.getDatePicker().setMaxDate(currentDate.getTime());
     }
 
     /**
      * setUpSpinner
      */
     private void setUpSpinner() {
-        final ArrayAdapter<CharSequence> adapterPriority = ArrayAdapter.createFromResource(getContext(),
+        final ArrayAdapter<CharSequence> orderAdapter = ArrayAdapter.createFromResource(getContext(),
                 R.array.spinner_sort_order, android.R.layout.simple_spinner_item);
-        adapterPriority.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        //mSpinnerSortOrder.setSelection(adapterPriority.getPosition(taskModel.getmPriority()));TODO
+        orderAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSpinnerSortOrder.setAdapter(orderAdapter);
+        mSpinnerSortOrder.setSelection(orderAdapter.getPosition(mSearchRequestModel.getmSort()));
         mSpinnerSortOrder.refreshDrawableState();
     }
 
+    /**
+     * setUpCheckbox
+     */
+    private void setUpCheckbox() {
+        mCheckedTextViewArts.setChecked(mSearchRequestModel.ismArts());
+        mCheckedTextViewFashionStyle.setChecked(mSearchRequestModel.ismFashionStyle());
+        mCheckedTextViewSports.setChecked(mSearchRequestModel.ismSports());
+    }
 }

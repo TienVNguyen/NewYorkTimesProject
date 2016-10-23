@@ -20,7 +20,9 @@ public class SearchRequestModel {
     private String mQuery;
     private String mBeginDate;
     private String mSort;
-    private String mNewsDesk;
+    private boolean mArts;
+    private boolean mFashionStyle;
+    private boolean mSports;
     private int mPage;
 
     /**
@@ -30,40 +32,72 @@ public class SearchRequestModel {
      */
     public LinkedHashMap<String, String> toQueryMap() {
         final LinkedHashMap<String, String> queryMap = new LinkedHashMap<>();
-        if (null != mQuery && 0 > mQuery.length()) {
+        if (null != mQuery && 0 < mQuery.length()) {
             queryMap.put(UrlConstants.Q, mQuery);
         }
-        if (null != mBeginDate && 0 > mBeginDate.length()) {
-            queryMap.put(UrlConstants.BEGIN_DATE, mBeginDate);
+        if (null != mBeginDate && 0 < mBeginDate.length()) {
+            queryMap.put(UrlConstants.BEGIN_DATE, mBeginDate.replaceAll("-", ""));
         }
-        if (null != mSort && 0 > mSort.length()) {
-            queryMap.put(UrlConstants.SORT, mSort);
+        if (null != mSort && 0 < mSort.length()) {
+            queryMap.put(UrlConstants.SORT, mSort.toLowerCase());
         }
-        if (null != mNewsDesk && 0 > mNewsDesk.length()) {
-            queryMap.put(UrlConstants.FQ, mNewsDesk);
+        if (mArts || mFashionStyle || mSports) {
+            final StringBuilder builder = new StringBuilder();
+            if (mArts) {
+                builder.append(UrlConstants.FQ_ARTS);
+            }
+            if (mFashionStyle) {
+                builder.append(" ");
+                builder.append(UrlConstants.FQ_FASHION_STYLE);
+            }
+            if (mSports) {
+                builder.append(" ");
+                builder.append(UrlConstants.FQ_SPORTS);
+            }
+            queryMap.put(UrlConstants.FQ, "news_desk:(" + builder.toString().trim() + ")");
         }
         queryMap.put(UrlConstants.PAGE, String.valueOf(mPage));
         return queryMap;
-    }
-
-    public String getmQuery() {
-        return mQuery;
     }
 
     public String getmBeginDate() {
         return mBeginDate;
     }
 
+    public void setmBeginDate(String mBeginDate) {
+        this.mBeginDate = mBeginDate;
+    }
+
     public String getmSort() {
         return mSort;
     }
 
-    public String getmNewsDesk() {
-        return mNewsDesk;
+    public void setmSort(String mSort) {
+        this.mSort = mSort;
     }
 
-    public int getmPage() {
-        return mPage;
+    public boolean ismArts() {
+        return mArts;
+    }
+
+    public void setmArts(boolean mArts) {
+        this.mArts = mArts;
+    }
+
+    public boolean ismFashionStyle() {
+        return mFashionStyle;
+    }
+
+    public void setmFashionStyle(boolean mFashionStyle) {
+        this.mFashionStyle = mFashionStyle;
+    }
+
+    public boolean ismSports() {
+        return mSports;
+    }
+
+    public void setmSports(boolean mSports) {
+        this.mSports = mSports;
     }
 
     public int nextPage() {
@@ -78,19 +112,7 @@ public class SearchRequestModel {
         this.mQuery = mQuery;
     }
 
-    public void setmBeginDate(String mBeginDate) {
-        this.mBeginDate = mBeginDate;
-    }
-
-    public void setmSort(String mSort) {
-        this.mSort = mSort;
-    }
-
-    public void setmNewsDesk(String mNewsDesk) {
-        this.mNewsDesk = mNewsDesk;
-    }
-
-    public void setmPage(int mPage) {
-        this.mPage = mPage;
+    public void resetQuery() {
+        this.mQuery = "";
     }
 }

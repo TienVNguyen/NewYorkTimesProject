@@ -7,8 +7,8 @@
 
 package com.training.tiennguyen.newyorktimesproject.activities;
 
-import android.app.Dialog;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -20,16 +20,17 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.training.tiennguyen.newyorktimesproject.R;
 import com.training.tiennguyen.newyorktimesproject.adapters.ArticleAdapter;
 import com.training.tiennguyen.newyorktimesproject.apis.ArticleAPI;
 import com.training.tiennguyen.newyorktimesproject.constants.IntentConstants;
+import com.training.tiennguyen.newyorktimesproject.fragments.ConnectionDialogFragment;
 import com.training.tiennguyen.newyorktimesproject.fragments.FilterDialogFragment;
+import com.training.tiennguyen.newyorktimesproject.listeners.ConnectionDialogListener;
 import com.training.tiennguyen.newyorktimesproject.listeners.FilterDialogListener;
 import com.training.tiennguyen.newyorktimesproject.listeners.LoadingListener;
 import com.training.tiennguyen.newyorktimesproject.models.SearchRequestModel;
@@ -39,6 +40,7 @@ import com.training.tiennguyen.newyorktimesproject.utils.RetrofitUtil;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import jp.wasabeef.blurry.Blurry;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -48,7 +50,7 @@ import retrofit2.Response;
  *
  * @author TienVNguyen
  */
-public class MainActivity extends AppCompatActivity implements FilterDialogListener {
+public class MainActivity extends AppCompatActivity implements FilterDialogListener, ConnectionDialogListener {
     @BindView(R.id.swipeRefreshLayoutMain)
     protected SwipeRefreshLayout swipeRefreshLayoutMain;
     @BindView(R.id.relativeLayoutLoading)
@@ -61,7 +63,6 @@ public class MainActivity extends AppCompatActivity implements FilterDialogListe
     protected RecyclerView recyclerViewArticles;
 
     private SearchView mSearchView;
-    private Dialog myDialog;
     private ArticleAPI mArticleAPI;
     private ArticleAdapter mAdapter;
     private SearchRequestModel mSearchRequest = new SearchRequestModel();
@@ -80,7 +81,6 @@ public class MainActivity extends AppCompatActivity implements FilterDialogListe
 
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
-                mSearchRequest.setmQuery(null);
                 search(false);
                 return true;
             }
@@ -107,6 +107,10 @@ public class MainActivity extends AppCompatActivity implements FilterDialogListe
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                if (newText.isEmpty())
+                    mSearchRequest.resetQuery();
+                else
+                    mSearchRequest.setmQuery(newText);
                 return false;
             }
         });
@@ -116,7 +120,8 @@ public class MainActivity extends AppCompatActivity implements FilterDialogListe
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_filter:
-                FilterDialogFragment filterDialogFragment = FilterDialogFragment.newInstance(mSearchRequest);
+                FilterDialogFragment filterDialogFragment = FilterDialogFragment.newInstance(
+                        mSearchRequest, getString(R.string.text_advanced_search_filters));
                 filterDialogFragment.show(mFragmentManager, IntentConstants.DIALOG_FILTER_TAG);
                 return true;
         }
@@ -125,7 +130,16 @@ public class MainActivity extends AppCompatActivity implements FilterDialogListe
 
     @Override
     public void onFinishFilterDialog(SearchRequestModel searchRequestModel) {
-        Toast.makeText(this, "Test", Toast.LENGTH_SHORT).show();
+        this.mSearchRequest = searchRequestModel;
+        search(false);
+    }
+
+    @Override
+    public void onFinishConnectionDialog(boolean isSearchMore) {
+        if (isSearchMore)
+            searchMore();
+        else
+            search(false);
     }
 
     @Override
@@ -149,12 +163,28 @@ public class MainActivity extends AppCompatActivity implements FilterDialogListe
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        setUpBlurBackground();
         setUpAPI();
         setUpAdapter();
         setUpWipeRefreshLayout();
         setUpRecyclerView();
 
+        final ArrayAdapter<CharSequence> orderAdapter = ArrayAdapter.createFromResource(MainActivity.this,
+                R.array.spinner_sort_order, android.R.layout.simple_spinner_item);
+        mSearchRequest.setmSort((String) orderAdapter.getItem(0));
         mSearchRequest.resetPage();
+    }
+
+    /**
+     * setUpBlurBackground
+     */
+    private void setUpBlurBackground() {
+        Blurry.with(MainActivity.this)
+                .radius(25)
+                .sampling(2)
+                .async()
+                .animate(500)
+                .onto(relativeLayoutLoading);
     }
 
     /**
@@ -193,6 +223,10 @@ public class MainActivity extends AppCompatActivity implements FilterDialogListe
         recyclerViewArticles.setLayoutManager(manager);
         recyclerViewArticles.setAdapter(mAdapter);
         recyclerViewArticles.setHasFixedSize(true);
+        recyclerViewArticles.getItemAnimator().setAddDuration(1000);
+        recyclerViewArticles.getItemAnimator().setRemoveDuration(1000);
+        recyclerViewArticles.getItemAnimator().setMoveDuration(1000);
+        recyclerViewArticles.getItemAnimator().setChangeDuration(1000);
     }
 
     /**
@@ -202,11 +236,11 @@ public class MainActivity extends AppCompatActivity implements FilterDialogListe
      */
     private void search(final boolean isWipe) {
         if (!ConfigurationUtils.isNetworkAvailable(MainActivity.this)) {
-            dialogMessageForInternetRequest(false);
+            ConnectionDialogFragment connectionDialogFragment = ConnectionDialogFragment.newInstance(
+                    false, getString(R.string.connection_error_title));
+            connectionDialogFragment.show(mFragmentManager, IntentConstants.DIALOG_CONNECTION_TAG);
         } else {
             swipeRefreshLayoutMain.setRefreshing(false);
-            if (null != myDialog)
-                myDialog.dismiss();
         }
 
         if (!isWipe) {
@@ -215,7 +249,7 @@ public class MainActivity extends AppCompatActivity implements FilterDialogListe
         }
 
         fetchArticles(body -> {
-            if (body != null && body.getmArticles().size() > 0)
+            if (null != body && 0 < body.getmArticles().size())
                 mAdapter.setArticles(body.getmArticles());
         });
     }
@@ -225,11 +259,11 @@ public class MainActivity extends AppCompatActivity implements FilterDialogListe
      */
     private void searchMore() {
         if (!ConfigurationUtils.isNetworkAvailable(MainActivity.this)) {
-            dialogMessageForInternetRequest(true);
+            ConnectionDialogFragment connectionDialogFragment = ConnectionDialogFragment.newInstance(
+                    false, getString(R.string.connection_error_title));
+            connectionDialogFragment.show(mFragmentManager, IntentConstants.DIALOG_CONNECTION_TAG);
         } else {
             swipeRefreshLayoutMain.setRefreshing(false);
-            if (null != myDialog)
-                myDialog.dismiss();
         }
 
         progressBarMore.setVisibility(View.VISIBLE);
@@ -237,29 +271,13 @@ public class MainActivity extends AppCompatActivity implements FilterDialogListe
         mSearchRequest.nextPage();
 
         fetchArticles(body -> {
-            if (body != null && body.getmArticles().size() > 0)
+            if (null != body && 0 < body.getmArticles().size())
                 mAdapter.setMoreArticles(body.getmArticles());
-        });
-    }
-
-    /**
-     * dialogMessageForInternetRequest
-     *
-     * @param isSearchMore {@link Boolean}
-     */
-    private void dialogMessageForInternetRequest(final boolean isSearchMore) {
-        myDialog = new Dialog(MainActivity.this);
-        myDialog.setContentView(R.layout.dialog_connection);
-        myDialog.setTitle(getString(R.string.connection_error_title));
-        myDialog.setCancelable(false);
-        final Button buttonRetry = (Button) myDialog.findViewById(R.id.buttonConnection);
-        buttonRetry.setOnClickListener(v -> {
-            if (isSearchMore)
-                MainActivity.this.searchMore();
             else
-                MainActivity.this.search(false);
+                Snackbar.make(swipeRefreshLayoutMain,
+                        getString(R.string.text_no_more_data), Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
         });
-        myDialog.show();
     }
 
     /**

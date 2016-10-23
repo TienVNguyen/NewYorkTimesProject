@@ -32,6 +32,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * @author TienVNguyen
  */
 public class RetrofitUtil {
+
     private static final MediaType JSON = MediaType.parse(UrlConstants.PARSE_JSON);
     private static final Gson GSON = new Gson();
 

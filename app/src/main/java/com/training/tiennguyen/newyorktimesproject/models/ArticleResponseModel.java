@@ -26,7 +26,7 @@ public class ArticleResponseModel {
     private String copyright;
 
     public JsonObject getResponse() {
-        if (response == null) {
+        if (null == response) {
             response = new JsonObject();
         }
         return response;

@@ -18,7 +18,7 @@ import java.util.List;
  *
  * @author TienVNguyen
  */
-@Parcel
+@Parcel(analyze = {ArticleModel.class})
 public class ArticleModel {
 
     @SerializedName("web_url")

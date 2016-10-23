@@ -25,8 +25,10 @@
         android:layout_below="@+id/textViewMessage"
         android:layout_centerHorizontal="true"
         android:layout_margin="@dimen/activity_margin_message"
+        android:drawableLeft="@android:drawable/checkbox_on_background"
         android:padding="@dimen/activity_padding_message"
         android:text="@string/button_try_again"
         android:textAllCaps="true"
+        android:textColor="@android:color/holo_red_light"
         android:textStyle="bold" />
 </RelativeLayout>

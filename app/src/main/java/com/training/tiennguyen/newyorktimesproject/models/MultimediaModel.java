@@ -17,7 +17,7 @@ import org.parceler.Parcel;
  *
  * @author TienVNguyen
  */
-@Parcel
+@Parcel(analyze = {MultimediaModel.class})
 public class MultimediaModel {
 
     @SerializedName("width")

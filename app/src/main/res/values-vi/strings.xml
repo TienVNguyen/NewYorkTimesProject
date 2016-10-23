@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2016. Self Training Systems, Inc - All Rights Reserved
   ~ Unauthorized copying of this file, via any medium is strictly prohibited
   ~ Proprietary and confidential
@@ -9,4 +8,23 @@
 <resources>
     <string name="app_name">Dự án New York Times</string>
     <string name="image_description">Hình ảnh mô tả</string>
+    <string name="connection_error_title">Lỗi kết nối</string>
+    <string name="connection_error_message">Không thể kết nối với Internet. Vui lòng kiểm tra kết nối của bạn</string>
+    <string name="menu_search">Tìm kiếm</string>
+    <string name="menu_filter">Bộ lọc</string>
+    <string name="menu_share">Chia sẻ</string>
+    <string name="button_try_again">Thử lại</string>
+    <string name="button_save">Lưu</string>
+    <string name="text_begin_date">Ngày bắt đầu</string>
+    <string name="text_sort_order">Xếp theo thứ tự</string>
+    <string name="text_news_desk_values">Giá trị sắp xếp</string>
+    <string name="text_arts">Nghệ thuật</string>
+    <string name="text_fashion_style"><![CDATA[Thời trang & Phong cách]]></string>
+    <string name="text_sports">Thể thao</string>
+    <string name="text_advanced_search_filters">Tìm kiếm nâng cao</string>
+    <string name="text_no_more_data">Không có dữ liệu nhiều hơn cho tải</string>
+    <string-array name="spinner_sort_order">
+        <item>Newest</item>
+        <item>Oldest</item>
+    </string-array>
 </resources>

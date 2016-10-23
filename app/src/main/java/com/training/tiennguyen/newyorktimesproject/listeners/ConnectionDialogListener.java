@@ -7,19 +7,17 @@
 
 package com.training.tiennguyen.newyorktimesproject.listeners;
 
-import com.training.tiennguyen.newyorktimesproject.models.SearchRequestModel;
-
 /**
- * {@link FilterDialogListener}
+ * ConnectionDialogListener
  *
- * @author TienVNguyen
+ * @author TienNguyen
  */
-public interface FilterDialogListener {
+public interface ConnectionDialogListener {
 
     /**
-     * onFinishFilterDialog
+     * onFinishConnectionDialog
      *
-     * @param searchRequestModel {@link SearchRequestModel}
+     * @param isSearchMore {@link Boolean}
      */
-    void onFinishFilterDialog(final SearchRequestModel searchRequestModel);
+    void onFinishConnectionDialog(final boolean isSearchMore);
 }

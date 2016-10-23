@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2016. Self Training Systems, Inc - All Rights Reserved
   ~ Unauthorized copying of this file, via any medium is strictly prohibited
   ~ Proprietary and confidential
@@ -9,4 +8,23 @@
 <resources>
     <string name="app_name">뉴욕 타임즈 프로젝트</string>
     <string name="image_description">이미지 설명</string>
+    <string name="connection_error_title">연결 문제</string>
+    <string name="connection_error_message">연결을 확인하시기 바랍니다</string>
+    <string name="menu_search">검색</string>
+    <string name="menu_filter">필터</string>
+    <string name="menu_share">공유</string>
+    <string name="button_try_again">다시 시도</string>
+    <string name="button_save">저장</string>
+    <string name="text_begin_date">날짜 시작</string>
+    <string name="text_sort_order">정렬 순서</string>
+    <string name="text_news_desk_values">뉴스 데스크 값</string>
+    <string name="text_arts">예술</string>
+    <string name="text_fashion_style"><![CDATA[패션 & 스타일]]></string>
+    <string name="text_sports">스포츠</string>
+    <string name="text_advanced_search_filters">고급 검색 필터</string>
+    <string name="text_no_more_data">로드하기 위해 더 이상 데이터가 없습니다</string>
+    <string-array name="spinner_sort_order">
+        <item>Newest</item>
+        <item>Oldest</item>
+    </string-array>
 </resources>

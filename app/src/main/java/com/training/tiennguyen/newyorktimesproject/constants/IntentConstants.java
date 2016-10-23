@@ -13,16 +13,34 @@ package com.training.tiennguyen.newyorktimesproject.constants;
  * @author TienVNguyen
  */
 public class IntentConstants {
+
     /**
      * SPLASH_TIME_OUT
      */
     public final static int SPLASH_TIME_OUT = 1000;
+
     /**
      * DIALOG_FILTER_TAG
      */
     public final static String DIALOG_FILTER_TAG = "dialog_filter";
+
+    /**
+     * DIALOG_CONNECTION_TAG
+     */
+    public final static String DIALOG_CONNECTION_TAG = "dialog_connection";
+
     /**
      * DIALOG_FILTER_TITLE
      */
     public final static String DIALOG_FILTER_TITLE = "DIALOG_FILTER_TITLE";
+
+    /**
+     * DIALOG_CONNECTION_TITLE
+     */
+    public final static String DIALOG_CONNECTION_TITLE = "DIALOG_CONNECTION_TITLE";
+
+    /**
+     * PARCELABLE_ARTICLE
+     */
+    public final static String PARCELABLE_ARTICLE = "PARCELABLE_ARTICLE";
 }
